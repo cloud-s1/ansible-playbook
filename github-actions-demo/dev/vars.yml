@@ -1,0 +1,5 @@
+registry: crpi-notabmu0yl0rr8sv.cn-shanghai.personal.cr.aliyuncs.com
+acr_namespace: s1line1-test
+repo_namespace: s1line1-test
+repo_image: github-actions-demo
+image_tag: ""

@@ -1,24 +1,25 @@
-
 - name: Stop old container
   # tags: [stop]
-  shell: |
-    docker rm -f {{acr_image}} || true
+  ansible.builtin.shell: |
+    docker rm -f {{ acr_image }} || true
 
 - name: Clean old images
-  shell: |
+  ansible.builtin.shell: |
     docker images \
       | grep "{{ acr_namespace }}/{{ acr_image }}" \
       | awk '{print $2}' \
       | xargs -r docker rmi 2>/dev/null || true
 
 - name: Pull image
-  shell: |
-    docker pull {{ registry }}/{{ acr_namespace }}/{{ acr_image }}:{{ image_tag }}
+  # tags: [pull]
+  ansible.builtin.shell: |
+    docker pull {{ registry }}/{{ acr_namespace }}/{{ acr_image }}:{{ acr_image_tag }}
 
 - name: Run new container
-  shell: |
+  # tags: [start]
+  ansible.builtin.shell: |
     docker run -d \
-      --name {{acr_image}} \
+      --name {{ acr_image }} \
       --restart always \
       -p 8080:8080 \
-      {{ registry }}/{{ acr_namespace }}/{{ acr_image }}:{{ image_tag }}
+      {{ registry }}/{{ acr_namespace }}/{{ acr_image }}:{{ acr_image_tag }}

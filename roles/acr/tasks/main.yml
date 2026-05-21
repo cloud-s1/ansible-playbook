@@ -1,13 +1,13 @@
 - name: Login to ACR
   # tags: [auth]
-  shell: |
+  ansible.builtin.shell: |
     echo "{{ acr_password }}" | docker login \
       -u 个人云数据 \
       --password-stdin \
       {{ registry }}
 
 - name: Get latest tag from ACR
-  shell: |
+  ansible.builtin.shell: |
           set -eu
 
           AUTH_HEADER=$(curl -sI "https://{{ registry }}/v2/" | grep -i "www-authenticate")
@@ -21,18 +21,18 @@
           TAGS_JSON=$(curl -sS -H "Authorization: Bearer $TOKEN" \
             "https://{{ registry }}/v2/{{ acr_namespace }}/{{ acr_image }}/tags/list")
 
-          image_tag=$(echo "$TAGS_JSON" | jq -r '.tags | sort_by(. | split("_")[0] | tonumber) | last')
+          acr_image_tag=$(echo "$TAGS_JSON" | jq -r '.tags | sort_by(. | split("_")[0] | tonumber) | last')
 
-          if [ -z "$image_tag" ] || [ "$image_tag" = "null" ]; then
+          if [ -z "$acr_image_tag" ] || [ "$acr_image_tag" = "null" ]; then
             echo "failed to get image tag"
             exit 1
           fi
 
-          echo "$image_tag"
+          echo "$acr_image_tag"
   register: acr_result
-  when: image_tag is none or image_tag == ""
+  when: acr_image_tag is none or acr_image_tag == ""
 
-- name: Set image_tag fact
-  set_fact:
-    image_tag: "{{ acr_result.stdout }}"
-  when: image_tag is none or image_tag == ""
+- name: Set acr_image_tag fact
+  ansible.builtin.set_fact:
+    acr_image_tag: "{{ acr_result.stdout }}"
+  when: acr_image_tag is none or acr_image_tag == ""

@@ -2,7 +2,7 @@
 - name: Stop old container
   # tags: [stop]
   shell: |
-    docker rm -f demo-app || true
+    docker rm -f {{repo_image}} || true
 
 - name: Clean old images
   shell: |
@@ -18,7 +18,7 @@
 - name: Run new container
   shell: |
     docker run -d \
-      --name demo-app \
+      --name {{repo_image}} \
       --restart always \
       -p 8080:8080 \
       {{ registry }}/{{ repo_namespace }}/{{ repo_image }}:{{ image_tag }}

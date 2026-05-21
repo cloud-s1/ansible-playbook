@@ -1,0 +1,22 @@
+name: Ansible CI
+
+on:
+  push:
+    branches: [main, feature_*]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: pip install ansible ansible-lint
+
+      - name: Syntax check
+        run: ansible-playbook github-actions-demo/deploy.yml --syntax-check
+
+      - name: Run ansible-lint
+        run: ansible-lint github-actions-demo/deploy.yml

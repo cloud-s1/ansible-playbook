@@ -1,4 +1,0 @@
-env: dev
-acr_password: dummy
-image_tag: ""
-tag: ""

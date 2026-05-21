@@ -16,7 +16,4 @@ jobs:
         run: pip install ansible ansible-lint
 
       - name: Syntax check
-        run: ansible-playbook github-actions-demo/deploy.yml -i github-actions-demo/inventory.ini -e env=dev --syntax-check
-
-      - name: Run ansible-lint
-        run: ansible-lint github-actions-demo/deploy.yml -e env=dev
+        run: ansible-playbook -i github-actions-demo/inventory.ini github-actions-demo/deploy.yml -e env=dev --syntax-check

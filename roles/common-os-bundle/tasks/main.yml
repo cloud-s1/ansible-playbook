@@ -1,0 +1,35 @@
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install common packages
+  ansible.builtin.apt:
+    name:
+      - curl
+      - wget
+      - git
+      - vim
+      - htop
+      - net-tools
+      - ca-certificates
+      - jq
+      - unzip
+      - python3
+      - python3-pip
+    state: present
+
+- name: Configure timezone
+  ansible.builtin.timezone:
+    name: "{{ timezone | default('Asia/Shanghai') }}"
+
+- name: Set up system limits
+  ansible.builtin.lineinfile:
+    path: /etc/security/limits.conf
+    line: "{{ item }}"
+    create: yes
+  loop:
+    - "* soft nofile 1048576"
+    - "* hard nofile 1048576"
+    - "* soft nproc 65535"
+    - "* hard nproc 65535"

@@ -1,15 +1,10 @@
 - hosts: "{{ env }}"
   become: yes
+  serial: 1
 
   vars_files:
     - "{{ env }}/vars.yml"
 
-  # vars:
-  #   tag: "{{ lookup('env', 'TAG') }}"
-  #   acr_password: "{{ lookup('env', 'ACR_PASSWORD') }}"
-
   roles:
     - role: ../roles/acr
-      # tags: [login]
     - role: ../roles/deploy
-      # tags: [deploy]

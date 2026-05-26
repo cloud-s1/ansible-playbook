@@ -1,8 +1,0 @@
-- name: install base packages
-  apt:
-    name:
-      - curl
-      - wget
-      - vim
-      - unzip
-    state: present

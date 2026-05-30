@@ -2,7 +2,7 @@
   # tags: [auth]
   ansible.builtin.shell: |
     echo "{{ acr_password }}" | docker login \
-      -u 个人云数据 \
+      -u "{{ acr_username }}" \
       --password-stdin \
       {{ registry }}
 
@@ -15,7 +15,7 @@
           SERVICE=$(echo "$AUTH_HEADER" | grep -oP 'service="\K[^"]+')
 
           SCOPE="repository:{{ acr_namespace }}/{{ acr_image }}:pull"
-          TOKEN=$(curl -sS -u "个人云数据:{{ acr_password }}" \
+          TOKEN=$(curl -sS -u "{{ acr_username }}:{{ acr_password }}" \
             "${REALM}?service=${SERVICE}&scope=${SCOPE}" | jq -r '.token // .access_token')
 
           TAGS_JSON=$(curl -sS -H "Authorization: Bearer $TOKEN" \

@@ -1,0 +1,93 @@
+name: Ansible CI/CD
+
+on:
+  push:
+    branches: [main, feature_*]
+  pull_request:
+    branches: [main]
+  workflow_call:
+    inputs:
+      CLOUD_TYPE:
+        description: aws or alicloud
+        type: string
+        required: true
+      HOST_IPS:
+        description: target host ips, comma-separated string (e.g. "10.0.1.1,10.0.1.2")
+        type: string
+        required: true
+      DEPLOY_ENV:
+        type: string
+        default: 'dev'
+      APP_NAME:
+        type: string
+        default: ""
+        required: true
+      DOCKER_PASSWORD:
+        type: string
+        default: ""
+        required: true
+      DOCKER_USERNAME:
+        type: string
+        default: ""
+        required: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: pip install ansible ansible-lint
+
+      - name: Syntax check
+        run: ansible-playbook -i github-actions-demo/inventory.ini github-actions-demo/deploy.yml -e env=dev --syntax-check
+
+      - name: ansible-lint
+        run: ansible-lint roles/acr/tasks/main.yml roles/deploy/tasks/main.yml
+
+  ansible-playbook:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get ECS IP or Fallback
+        if: ${{ github.event_name == 'workflow_call' }}
+        run: |
+          if [ -n "${{ inputs.HOST_IPS }}" ]; then
+            echo "[${{ inputs.DEPLOY_ENV }}]" > /tmp/inventory.ini
+            echo ${{ inputs.HOST_IPS }} | tr ',' '\n' >> /tmp/inventory.ini
+            echo "Using terraform IPs: $(cat /tmp/inventory.ini)"
+          fi
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: exec deploy
+        if: ${{ github.event_name == 'workflow_call' }}
+        run: |
+          PRIVATE_KEY=""
+          if [ "${{ inputs.CLOUD_TYPE }}" = "aws" ]; then
+            PRIVATE_KEY=${{ secrets.AWS_PRIVATE_KEY }}
+          fi
+          if [ "${{ inputs.CLOUD_TYPE }}" = "alicloud" ];then
+            PRIVATE_KEY=${{ secrets.ALICLOUD_PRIVATE_KEY }}
+          fi
+          if [ "$PRIVATE_KEY" = "" ];then
+            echo "PRIVATE_KEY is empty"
+            exit 0
+          fi
+          INVENTORY="/tmp/inventory.ini"
+          if [ ! -f "$INVENTORY" ]; then
+            INVENTORY="${{ inputs.APP_NAME }}/inventory.ini"
+          fi
+          echo "Using inventory: $INVENTORY"
+          echo "$PRIVATE_KEY" > /tmp/ssh_key
+          chmod 600 /tmp/ssh_key
+          ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook -i "$INVENTORY" ${{ inputs.APP_NAME }}/deploy.yml \
+          -e "env=${{ inputs.DEPLOY_ENV }} acr_password=${{ inputs.DOCKER_PASSWORD }} acr_user=${{ inputs.DOCKER_USERNAME }}" \
+          --private-key /tmp/ssh_key -u ubuntu
+
+

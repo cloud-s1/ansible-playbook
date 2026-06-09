@@ -25,7 +25,7 @@ on:
     
     secrets:
       personal_access_token:
-      required: true
+        required: true
 
 jobs:
   lint:

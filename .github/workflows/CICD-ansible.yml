@@ -22,14 +22,6 @@ on:
         type: string
         default: ""
         required: true
-      DOCKER_PASSWORD:
-        type: string
-        default: ""
-        required: true
-      DOCKER_USERNAME:
-        type: string
-        default: ""
-        required: true
 
 jobs:
   lint:
@@ -87,7 +79,7 @@ jobs:
           echo "$PRIVATE_KEY" > /tmp/ssh_key
           chmod 600 /tmp/ssh_key
           ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook -i "$INVENTORY" ${{ inputs.APP_NAME }}/deploy.yml \
-          -e "env=${{ inputs.DEPLOY_ENV }} acr_password=${{ inputs.DOCKER_PASSWORD }} acr_user=${{ inputs.DOCKER_USERNAME }}" \
+          -e "env=${{ inputs.DEPLOY_ENV }} acr_password=${{ secrets.DOCKER_PASSWORD }} acr_user=${{ secrets.DOCKER_USERNAME }}" \
           --private-key /tmp/ssh_key -u ubuntu
 
 

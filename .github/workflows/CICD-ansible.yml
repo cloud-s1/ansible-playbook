@@ -22,6 +22,10 @@ on:
         type: string
         default: ""
         required: true
+    
+    secrets:
+      personal_access_token:
+      required: true
 
 jobs:
   lint:

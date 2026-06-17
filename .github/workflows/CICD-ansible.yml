@@ -24,7 +24,7 @@ on:
         required: true
     
     secrets:
-      personal_access_token:
+      private_key:
         required: true
 
 jobs:
@@ -64,23 +64,13 @@ jobs:
       - name: exec deploy
         if: ${{ github.event_name == 'workflow_call' }}
         run: |
-          PRIVATE_KEY=""
-          if [ "${{ inputs.CLOUD_TYPE }}" = "aws" ]; then
-            PRIVATE_KEY=${{ secrets.AWS_PRIVATE_KEY }}
-          fi
-          if [ "${{ inputs.CLOUD_TYPE }}" = "alicloud" ];then
-            PRIVATE_KEY=${{ secrets.ALICLOUD_PRIVATE_KEY }}
-          fi
-          if [ "$PRIVATE_KEY" = "" ];then
-            echo "PRIVATE_KEY is empty"
-            exit 0
-          fi
+          REMOTE_PRIVATE_KEY="${{ secrets.private_key }}"
           INVENTORY="/tmp/inventory.ini"
           if [ ! -f "$INVENTORY" ]; then
             INVENTORY="${{ inputs.APP_NAME }}/inventory.ini"
           fi
           echo "Using inventory: $INVENTORY"
-          echo "$PRIVATE_KEY" > /tmp/ssh_key
+          echo "$REMOTE_PRIVATE_KEY" > /tmp/ssh_key
           chmod 600 /tmp/ssh_key
           ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook -i "$INVENTORY" ${{ inputs.APP_NAME }}/deploy.yml \
           -e "env=${{ inputs.DEPLOY_ENV }} acr_password=${{ secrets.DOCKER_PASSWORD }} acr_user=${{ secrets.DOCKER_USERNAME }}" \

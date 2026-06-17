@@ -5,7 +5,7 @@
       -u "{{ acr_user }}" \
       --password-stdin \
       {{ registry }}
-  args: 
+  args:
     stdin: "{{ acr_password }}"
   no_log: true
 

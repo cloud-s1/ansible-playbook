@@ -19,17 +19,17 @@
       - python3-pip
     state: present
 
-- name: Configure timezone
-  ansible.builtin.timezone:
-    name: "{{ timezone | default('Asia/Shanghai') }}"
+# - name: Configure timezone
+#   ansible.builtin.timezone:
+#     name: "{{ timezone | default('Asia/Shanghai') }}"
 
-- name: Set up system limits
-  ansible.builtin.lineinfile:
-    path: /etc/security/limits.conf
-    line: "{{ item }}"
-    create: yes
-  loop:
-    - "* soft nofile 1048576"
-    - "* hard nofile 1048576"
-    - "* soft nproc 65535"
-    - "* hard nproc 65535"
+# - name: Set up system limits
+#   ansible.builtin.lineinfile:
+#     path: /etc/security/limits.conf
+#     line: "{{ item }}"
+#     create: yes
+#   loop:
+#     - "* soft nofile 1048576"
+#     - "* hard nofile 1048576"
+#     - "* soft nproc 65535"
+#     - "* hard nproc 65535"

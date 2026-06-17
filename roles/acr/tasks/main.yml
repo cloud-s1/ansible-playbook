@@ -8,11 +8,25 @@
 
 - name: Get latest tag from ACR
   ansible.builtin.shell: |
-          set -eu
+          set -e
 
-          AUTH_HEADER=$(curl -sI "https://{{ registry }}/v2/" | grep -i "www-authenticate")
+          AUTH_HEADER=$(curl -sI "https://{{ registry }}/v2/" | grep -i "www-authenticate" || true)
+
+          if [ -z "$AUTH_HEADER" ]; then
+            echo "ERROR: no www-authenticate header from registry /v2/"
+            curl -v "https://{{ registry }}/v2/" 2>&1 | head -20
+            exit 1
+          fi
+
           REALM=$(echo "$AUTH_HEADER" | sed -n 's/.*realm="\([^"]*\)".*/\1/p')
           SERVICE=$(echo "$AUTH_HEADER" | sed -n 's/.*service="\([^"]*\)".*/\1/p')
+
+          if [ -z "$REALM" ]; then
+            echo "ERROR: failed to extract realm from auth header: $AUTH_HEADER"
+            exit 1
+          fi
+
+          which jq || (echo "ERROR: jq not installed" && exit 1)
 
           SCOPE="repository:{{ acr_namespace }}/{{ acr_image }}:pull"
           TOKEN=$(curl -sS -u "{{ acr_user }}:{{ acr_password }}" \

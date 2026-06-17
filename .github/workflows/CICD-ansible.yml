@@ -78,7 +78,7 @@ jobs:
           token: ${{ secrets.CHECKOUT_TOKEN }}
 
       - name: exec deploy
-        if: ${{ github.event_name == 'workflow_call' }}
+        # if: ${{ github.event_name == 'workflow_call' }}
         run: |
           REMOTE_PRIVATE_KEY="${{ secrets.private_key }}"
           INVENTORY="/tmp/inventory.ini"

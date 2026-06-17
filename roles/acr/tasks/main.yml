@@ -11,8 +11,8 @@
           set -eu
 
           AUTH_HEADER=$(curl -sI "https://{{ registry }}/v2/" | grep -i "www-authenticate")
-          REALM=$(echo "$AUTH_HEADER" | grep -oP 'realm="\K[^"]+')
-          SERVICE=$(echo "$AUTH_HEADER" | grep -oP 'service="\K[^"]+')
+          REALM=$(echo "$AUTH_HEADER" | sed -n 's/.*realm="\([^"]*\)".*/\1/p')
+          SERVICE=$(echo "$AUTH_HEADER" | sed -n 's/.*service="\([^"]*\)".*/\1/p')
 
           SCOPE="repository:{{ acr_namespace }}/{{ acr_image }}:pull"
           TOKEN=$(curl -sS -u "{{ acr_user }}:{{ acr_password }}" \

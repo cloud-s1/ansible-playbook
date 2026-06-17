@@ -6,5 +6,6 @@
     - "{{ env }}/vars.yml"
 
   roles:
+    - role: ../roles/common-os-bundle
     - role: ../roles/acr
     - role: ../roles/deploy

@@ -1,10 +1,13 @@
 - name: Login to ACR
   # tags: [auth]
   ansible.builtin.shell: |
-    echo "{{ acr_password }}" | docker login \
+    docker login \
       -u "{{ acr_user }}" \
       --password-stdin \
       {{ registry }}
+  args: 
+    stdin: "{{ acr_password }}"
+  no_log: true
 
 - name: Get latest tag from ACR
   ansible.builtin.shell: |

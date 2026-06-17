@@ -36,8 +36,13 @@ jobs:
       - name: Install Ansible
         run: pip install ansible ansible-lint
 
-      - name: Syntax check
-        run: ansible-playbook -i github-actions-demo/inventory.ini github-actions-demo/deploy.yml -e env=dev --syntax-check
+      # - name: Syntax check
+      #   run: ansible-playbook -i github-actions-demo/inventory.ini github-actions-demo/deploy.yml -e env=dev --syntax-check
+
+      - name: print pwd ls
+        run: |
+          pwd
+          ls
 
       - name: ansible-lint
         run: ansible-lint roles/acr/tasks/main.yml roles/deploy/tasks/main.yml

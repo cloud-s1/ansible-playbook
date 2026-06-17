@@ -28,6 +28,10 @@ on:
         required: true
       CHECKOUT_TOKEN:
         required: true
+      DOCKER_PASSWORD:
+        required: true
+      DOCKER_USERNAME:
+        required: true
 
 jobs:
   lint:

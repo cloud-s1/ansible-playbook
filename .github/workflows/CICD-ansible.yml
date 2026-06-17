@@ -76,12 +76,21 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: [ansible-playbook]
+    needs: [lint, ansible-playbook]
     steps:
       - uses: actions/checkout@v4
         with:
           repository: s1line1/ansible-playbook
           token: ${{ secrets.CHECKOUT_TOKEN }}
+
+      - name: Get ECS IP or Fallback
+        # if: ${{ github.event_name == 'workflow_call' }}
+        run: |
+          if [ -n "${{ inputs.HOST_IPS }}" ]; then
+            echo "[${{ inputs.DEPLOY_ENV }}]" > /tmp/inventory.ini
+            echo ${{ inputs.HOST_IPS }} | tr ',' '\n' >> /tmp/inventory.ini
+            echo "Using terraform IPs: $(cat /tmp/inventory.ini)"
+          fi
 
       - name: exec deploy
         # if: ${{ github.event_name == 'workflow_call' }}

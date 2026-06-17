@@ -61,7 +61,7 @@ jobs:
           token: ${{ secrets.CHECKOUT_TOKEN }}
 
       - name: Get ECS IP or Fallback
-        if: ${{ github.event_name == 'workflow_call' }}
+        # if: ${{ github.event_name == 'workflow_call' }}
         run: |
           if [ -n "${{ inputs.HOST_IPS }}" ]; then
             echo "[${{ inputs.DEPLOY_ENV }}]" > /tmp/inventory.ini
